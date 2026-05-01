@@ -37,10 +37,6 @@ def hablar(text):
         md = f'<audio autoplay="true" src="data:audio/mp3;base64,{b64}">'
         st.markdown(md, unsafe_allow_html=True)
 
-    engine.say(text)
-    engine.runAndWait()
-
-
 # --- CHAT ---
 for message in st.session_state.chat.history:
     with st.chat_message("user" if message.role == "user" else "assistant"):
