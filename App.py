@@ -27,16 +27,16 @@ if "chat" not in st.session_state:
     st.session_state.chat = model.start_chat(history=[])
 
 # --- SALIDA DE VOZ ---
-def import pyttsx3
-
 def hablar(text):
-    engine = pyttsx3.init()
-    voices = engine.getProperty('voices')
-    # Esto busca una voz masculina en tu sistema
-    for voice in voices:
-        if "spanish" in voice.name.lower():
-            engine.setProperty('voice', voice.id)
-            break
+    # Usamos 'es-us' que suele tener un tono más grave y masculino en Google
+    tts = gTTS(text=text, lang='es-us') 
+    tts.save("temp.mp3")
+    with open("temp.mp3", "rb") as f:
+        data = f.read()
+        b64 = base64.b64encode(data).decode()
+        md = f'<audio autoplay="true" src="data:audio/mp3;base64,{b64}">'
+        st.markdown(md, unsafe_allow_html=True)
+
     engine.say(text)
     engine.runAndWait()
 
