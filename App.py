@@ -3,14 +3,15 @@ import google.generativeai as genai
 from gtts import gTTS
 import base64
 import os
+from streamlit_mic_recorder import speech_to_text
 
 # --- PROTOCOLO DE INTERFAZ ---
-st.set_page_config(page_title="JARVIS OS", page_icon="🤖")
+st.set_page_config(page_title="JARVIS OS", page_icon="🤖", layout="centered")
 
 st.markdown("""
     <style>
     .stApp { background-color: #000000; color: #00ffff; }
-    [data-testid="stChatMessage"] { background-color: #000d1a; border: 1px solid #00ffff; }
+    [data-testid="stChatMessage"] { background-color: #0e1117; border: 1px solid #00ffff; }
     h1 { color: #00ffff; text-shadow: 0 0 10px #00ffff; }
     </style>
     """, unsafe_allow_html=True)
@@ -21,33 +22,50 @@ st.title("🤖 JARVIS SYSTEM MK-X")
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
 model = genai.GenerativeModel('gemini-2.5-flash')
 
-
-
 if "chat" not in st.session_state:
     st.session_state.chat = model.start_chat(history=[])
 
 # --- SALIDA DE VOZ ---
 def hablar(text):
-    # Usamos 'es-us' que suele tener un tono más grave y masculino en Google
-    tts = gTTS(text=text, lang='es-us') 
+    # 'es-us' suele activar una voz masculina más neutra
+    tts = gTTS(text=text, lang='es-us')
     tts.save("temp.mp3")
     with open("temp.mp3", "rb") as f:
         data = f.read()
         b64 = base64.b64encode(data).decode()
         md = f'<audio autoplay="true" src="data:audio/mp3;base64,{b64}">'
         st.markdown(md, unsafe_allow_html=True)
+    os.remove("temp.mp3")
 
-# --- CHAT ---
-for message in st.session_state.chat.history:
-    with st.chat_message("user" if message.role == "user" else "assistant"):
-        st.markdown(message.parts[0].text)
+# --- ENTRADA DE VOZ (MANOS LIBRES/BOTÓN) ---
+st.write("Presiona el micrófono para hablar con JARVIS:")
+# Esto convierte tu voz a texto directamente
+voz_usuario = speech_to_text(language='es', start_prompt="🎤 ESCUCHANDO...", key='audio_input')
 
+# --- LÓGICA DE PROCESAMIENTO ---
 prompt = st.chat_input("Diga su comando, Señor...")
 
-if prompt:
+# Si el usuario habla o escribe
+if voz_usuario or prompt:
+    entrada = voz_usuario if voz_usuario else prompt
+    
+    # Mostrar mensaje del usuario
     with st.chat_message("user"):
-        st.markdown(prompt)
-    response = st.session_state.chat.send_message(prompt)
-    with st.chat_message("assistant"):
-        st.markdown(response.text)
+        st.markdown(entrada)
+    
+    # Generar respuesta de JARVIS
+    try:
+        response = st.session_state.chat.send_message(entrada)
+        with st.chat_message("assistant"):
+            st.markdown(response.text)
+        
+        # JARVIS habla la respuesta
         hablar(response.text)
+    except Exception as e:
+        st.error(f"Error de conexión: {e}")
+
+# --- HISTORIAL VISUAL ---
+for message in st.session_state.chat.history:
+    if message.role == "model":
+        with st.chat_message("assistant"):
+            st.markdown(message.parts[0].text)
