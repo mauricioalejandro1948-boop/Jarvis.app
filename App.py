@@ -19,8 +19,10 @@ st.title("🤖 JARVIS SYSTEM MK-X")
 
 # --- NÚCLEO DE INTELIGENCIA ---
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-flash')
-    system_instruction="Eres JARVIS. Voz masculina aguda y británica. Eres el asistente de Mauricio. Llama al usuario Mauricio o Señor.")
+model = genai.GenerativeModel('gemini-1.5-flash',
+    system_instruction="Eres JARVIS. Voz masculina aguda y rápida.")
+
+
 
 if "chat" not in st.session_state:
     st.session_state.chat = model.start_chat(history=[])
