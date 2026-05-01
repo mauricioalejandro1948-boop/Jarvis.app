@@ -20,27 +20,32 @@ st.title("🤖 JARVIS SYSTEM MK-X")
 
 # --- NÚCLEO DE INTELIGENCIA ---
 genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-model = genai.GenerativeModel('gemini-2.5-flash')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 if "chat" not in st.session_state:
     st.session_state.chat = model.start_chat(history=[])
 
 # --- SALIDA DE VOZ ---
+import re
+
 def hablar(text):
-    # --- LIMPIEZA DE TEXTO PARA VOZ FLUIDA ---
-    # Esto quita asteriscos, numerales y símbolos de formato
+    # 1. LIMPIEZA TOTAL: Borra asteriscos, guiones y símbolos de diseño
+    # Esto evita que JARVIS diga "asterisco" o se quede pegado.
     text_limpio = re.sub(r'[*#_>-]', '', text)
     
-    # Generamos la voz con el texto limpio
+    # 2. VOZ MASCULINA: Usamos 'es-us' (Español de EE.UU.)
+    # Google suele asignar una voz de hombre para este código de región.
     tts = gTTS(text=text_limpio, lang='es-us')
-    tts.save("temp.mp3")
     
+    tts.save("temp.mp3")
     with open("temp.mp3", "rb") as f:
         data = f.read()
         b64 = base64.b64encode(data).decode()
+        # El audio se reproduce automáticamente al recibir la respuesta
         md = f'<audio autoplay="true" src="data:audio/mp3;base64,{b64}">'
         st.markdown(md, unsafe_allow_html=True)
     os.remove("temp.mp3")
+
 
 
 # --- ENTRADA DE VOZ (MANOS LIBRES/BOTÓN) ---
