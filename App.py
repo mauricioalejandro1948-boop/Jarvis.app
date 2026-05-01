@@ -18,8 +18,9 @@ st.markdown("""
 st.title("🤖 JARVIS SYSTEM MK-X")
 
 # --- NÚCLEO DE INTELIGENCIA ---
-genai.configure(api_key="AIzaSyCrtuM4DbnYpAt93BN1CGSkGLolqd6lvDE")
-model = genai.GenerativeModel('models/gemini-1.5-flash', 
+genai.configure(api_key="AIzaSyCrtuM4DbnYpAt93BN1CGSkGLolqd6lvDE") 
+
+model = genai.GenerativeModel('gemini-1.5-flash', 
     system_instruction="Eres JARVIS. Voz masculina aguda y británica. Eres el asistente de Mauricio. Llama al usuario Mauricio o Señor.")
 
 if "chat" not in st.session_state:
