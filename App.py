@@ -51,4 +51,3 @@ if prompt:
     with st.chat_message("assistant"):
         st.markdown(response.text)
         hablar(response.text)
-pyttsx3
