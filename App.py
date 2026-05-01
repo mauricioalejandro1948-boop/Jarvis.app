@@ -26,7 +26,6 @@ if "chat" not in st.session_state:
     st.session_state.chat = model.start_chat(history=[])
 
 # --- SALIDA DE VOZ ---
-def himport re
 def hablar(text):
     # --- LIMPIEZA DE TEXTO PARA VOZ FLUIDA ---
     # Esto quita asteriscos, numerales y símbolos de formato
