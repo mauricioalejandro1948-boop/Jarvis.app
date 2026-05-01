@@ -26,16 +26,23 @@ if "chat" not in st.session_state:
     st.session_state.chat = model.start_chat(history=[])
 
 # --- SALIDA DE VOZ ---
+def himport re
 def hablar(text):
-    # 'es-us' suele activar una voz masculina más neutra
-    tts = gTTS(text=text, lang='es-us')
+    # --- LIMPIEZA DE TEXTO PARA VOZ FLUIDA ---
+    # Esto quita asteriscos, numerales y símbolos de formato
+    text_limpio = re.sub(r'[*#_>-]', '', text)
+    
+    # Generamos la voz con el texto limpio
+    tts = gTTS(text=text_limpio, lang='es-us')
     tts.save("temp.mp3")
+    
     with open("temp.mp3", "rb") as f:
         data = f.read()
         b64 = base64.b64encode(data).decode()
         md = f'<audio autoplay="true" src="data:audio/mp3;base64,{b64}">'
         st.markdown(md, unsafe_allow_html=True)
     os.remove("temp.mp3")
+
 
 # --- ENTRADA DE VOZ (MANOS LIBRES/BOTÓN) ---
 st.write("Presiona el micrófono para hablar con JARVIS:")
